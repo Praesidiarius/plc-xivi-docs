@@ -1,0 +1,63 @@
+# Build the documentation and publish it to GitHub Pages.
+#
+# **The build runs in the same image `bin/docs` uses**, pinned to the same major
+# tag, so that a build passing here and a build passing on somebody's machine are
+# the same build. A workflow that `pip install`s the theme would drift from the
+# image the moment either moved, and the first anybody would know is a page that
+# renders differently in the two places.
+#
+# **`--strict` is the gate.** A link to a page that does not exist fails the job,
+# and a failed job publishes nothing — the previously published site stays up,
+# which is the right outcome: a broken link is worth stopping for, and is not
+# worth taking the documentation offline for.
+name: Pages
+
+on:
+    push:
+        branches: [main]
+    # So a broken link can be caught on the branch rather than after it lands.
+    # This job builds but does not deploy; only `main` reaches the deploy job.
+    pull_request:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+# One deployment at a time, and never cancel one half-done: `cancel-in-progress`
+# on a deploy leaves Pages in whatever state it reached.
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        container:
+            image: squidfunk/mkdocs-material:9
+            # The image's entrypoint is `mkdocs` itself, which would swallow
+            # every `run:` step. Actions needs a shell.
+            options: --entrypoint=""
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Build
+              run: mkdocs build --strict
+
+            - name: Upload
+              if: github.ref == 'refs/heads/main'
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: site
+
+    deploy:
+        needs: build
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - id: deployment
+              uses: actions/deploy-pages@v4
