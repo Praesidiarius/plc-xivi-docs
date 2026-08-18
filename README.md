@@ -45,24 +45,6 @@ installation *is*, not why it was built that way.
 `squidfunk/mkdocs-material` image its own maintainers publish. There is no
 toolchain here to maintain beyond a tag in `compose.yaml`.
 
-An earlier attempt used `symfony-tools/docs-builder`, the tool behind Symfony's
-own documentation, and it was abandoned for a reason worth recording: **the
-builder is not where symfony.com's appearance comes from.** It ships two themes —
-`default`, and a snapshot of the Read the Docs Sphinx theme from August 2021
-whose layout is largely commented out and whose stylesheet links resolve relative
-to the page, so every file below the root renders unstyled. The design at
-symfony.com/doc belongs to the symfony.com website and is not published. Adopting
-that builder therefore bought the format and none of the look, and building a
-theme from nothing is a cost with no upside when a maintained one exists.
-
 ## Licence
 
 MIT — see [LICENSE](LICENSE), the same licence as Xivi itself.
-
-The shape of this documentation takes after
-[`symfony/symfony-docs`](https://github.com/symfony/symfony-docs), which is a
-fine example of what a documentation repository can be. Its *text* is licensed
-CC BY-SA 3.0 and none of it is used here — every page is written for Xivi, about
-Xivi. Inspiration is not adaptation, so no attribution is owed beyond this
-paragraph, which is offered because it is deserved rather than because it is
-required.
