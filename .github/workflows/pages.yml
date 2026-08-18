@@ -2,9 +2,15 @@
 #
 # **The build runs in the same image `bin/docs` uses**, pinned to the same major
 # tag, so that a build passing here and a build passing on somebody's machine are
-# the same build. A workflow that `pip install`s the theme would drift from the
+# the same build. A workflow that `pip install`ed the theme would drift from the
 # image the moment either moved, and the first anybody would know is a page that
 # renders differently in the two places.
+#
+# **The image is used for a step, not for the job.** Running the whole job inside
+# it was the obvious thing and it fails: the image is Alpine, its `tar` is
+# busybox's, and `upload-pages-artifact` calls GNU `tar` with flags busybox does
+# not have — so the build succeeds and the upload dies printing tar's usage. The
+# runner keeps its own tools; only `mkdocs` comes from the image.
 #
 # **`--strict` is the gate.** A link to a page that does not exist fails the job,
 # and a failed job publishes nothing — the previously published site stays up,
@@ -15,8 +21,8 @@ name: Pages
 on:
     push:
         branches: [main]
-    # So a broken link can be caught on the branch rather than after it lands.
-    # This job builds but does not deploy; only `main` reaches the deploy job.
+    # So a broken link is caught on the branch rather than after it lands. This
+    # builds and does not deploy; only `main` reaches the deploy job.
     pull_request:
     workflow_dispatch:
 
@@ -34,16 +40,17 @@ concurrency:
 jobs:
     build:
         runs-on: ubuntu-latest
-        container:
-            image: squidfunk/mkdocs-material:9
-            # The image's entrypoint is `mkdocs` itself, which would swallow
-            # every `run:` step. Actions needs a shell.
-            options: --entrypoint=""
         steps:
             - uses: actions/checkout@v4
 
             - name: Build
-              run: mkdocs build --strict
+              # As the runner's own user, so `site/` is readable by the steps
+              # that follow rather than root-owned inside a mounted volume.
+              run: |
+                  docker run --rm \
+                      --user "$(id -u):$(id -g)" \
+                      -v "$PWD:/docs" \
+                      squidfunk/mkdocs-material:9 build --strict
 
             - name: Upload
               if: github.ref == 'refs/heads/main'
