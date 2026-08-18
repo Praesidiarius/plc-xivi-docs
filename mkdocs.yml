@@ -31,20 +31,26 @@ theme:
     # Both, because documentation is read in both, and a site that ignores the
     # reader's setting is a site that gets a screenshot taken of it at 2am.
     - media: "(prefers-color-scheme)"
+      # The colours are repeated on all three entries on purpose: this first one
+      # is what renders before any preference is known, and an entry without them
+      # falls back to Material's indigo — which is how the header stayed blue
+      # after the other two were changed.
+      primary: teal
+      accent: cyan
       toggle:
         icon: material/brightness-auto
         name: Follow the system
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: indigo
+      primary: teal
+      accent: cyan
       toggle:
         icon: material/brightness-7
         name: Switch to dark
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: teal
+      accent: cyan
       toggle:
         icon: material/brightness-4
         name: Switch to light
