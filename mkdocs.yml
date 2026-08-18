@@ -66,6 +66,13 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  # `:material-rocket-launch:` and friends. Without this they are not icons,
+  # they are the literal text — which is what the index page shipped as until
+  # somebody looked at it. Material's icons ride the emoji extension rather than
+  # having one of their own, which is not obvious from the shortcode.
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
