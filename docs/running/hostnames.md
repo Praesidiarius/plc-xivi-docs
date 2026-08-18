@@ -84,9 +84,24 @@ follows from the choice is
 It does not have to appear in `XIVI_TRUSTED_DOMAINS`; it is added for you, along
 with every other host served without a customer.
 
+**The hostname is not a boundary, and there is a setting that is.** Anybody who
+can set the `Host` header reaches the control-plane sign-in page from any address
+that terminates the connection, and no hostname setting changes that.
+`CONTROL_PLANE_ALLOWED_IPS` restricts that host to a list of addresses and CIDR
+ranges, which is the one thing that can refuse a request for *where it came
+from*. It is empty by default, it never affects a customer, and it is described
+with its check command — and its lock-yourself-out warning — under
+[The control plane](../getting-started/control-plane.md#restricting-it-to-your-own-addresses).
+
+If you set it **and** you have a proxy in front, set `TRUSTED_PROXIES` too: the
+allow-list is matched against the same resolved client address as everything else
+on this page, so without it every request looks as though it came from your
+balancer.
+
 !!! note "Why it was built this way"
 
     The reasoning — why the pattern is composed by the application rather than
     configured, and why the control-plane hostname is not a security boundary —
     is in `docs/architecture.md` §4.3 of the
-    [main repository](https://github.com/Praesidiarius/plc-xivi).
+    [main repository](https://github.com/Praesidiarius/plc-xivi); the address
+    allow-list, and why it reads no header of its own, is §8.9.

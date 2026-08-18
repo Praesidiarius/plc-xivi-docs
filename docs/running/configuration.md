@@ -19,6 +19,7 @@ with real environment variables or with the Symfony secrets vault.
 | `XIVI_TRUSTED_DOMAINS` | The domains this installation answers to, comma separated. **Empty means the `Host` header is not checked at all** — see [Hostnames](hostnames.md) |
 | `TRUSTED_PROXIES` | Addresses of a reverse proxy in front of this application. Empty means `X-Forwarded-*` is ignored — see [Hostnames](hostnames.md) |
 | `CONTROL_PLANE_HOST` | The hostname the control plane is served on — see [The control plane](../getting-started/control-plane.md) |
+| `CONTROL_PLANE_ALLOWED_IPS` | Addresses and CIDR ranges that may reach the control plane. **Empty means no restriction**; customers are never affected — see [The control plane](../getting-started/control-plane.md#restricting-it-to-your-own-addresses) |
 | `SIGNUP_HOST` | The hostname the public signup endpoint is served on. **Empty means no signup route exists at all** — see [Self-service signup](signup.md) |
 | `XIVI_SIGNUP_SECRET` | The shared secret the calling site presents in `X-Xivi-Signup-Key` |
 | `XIVI_SIGNUP_PLANS` | Which plans self-service may ask for, comma separated, most ordinary first |

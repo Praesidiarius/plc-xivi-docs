@@ -46,6 +46,7 @@ More about what an operator is, and why there is no sign-up:
 | --- | --- |
 | `deploy:check-secrets` | Refuses in production on a secret still set to the placeholder committed in `.env`. The container entrypoint runs it on every start; it does nothing outside `APP_ENV=prod` |
 | `deploy:check-hosts` | Prints the hostnames this installation answers to, and names every customer the pattern would answer with a 400. `bin/deploy` runs it and stops on exit 3; the entrypoint runs it and only prints |
+| `deploy:check-control-plane [--address=]` | Prints which addresses `CONTROL_PLANE_ALLOWED_IPS` admits, and whether one you name would get in. Exit 3 if an entry is not an address or the address you asked about would be refused. **Run it before you depend on that variable** — see [The control plane](../getting-started/control-plane.md#restricting-it-to-your-own-addresses) |
 | `deploy:registry-grants <role>` | Prints the SQL that gives the customer-facing image a read-only control-plane role — see [Deploying](deploying.md) |
 | `signup:provision [--email=]` | Turns confirmed self-service signups into customers, one at a time, and invites each first user; put it in cron — see [Scheduled jobs](scheduled-jobs.md) |
 | `doctrine:migrations:migrate --em=control` | Control-plane schema only. `bin/deploy` is normally what runs this |
