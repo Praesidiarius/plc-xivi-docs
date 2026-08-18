@@ -16,8 +16,10 @@ see every customer is not one anybody should be able to enrol themselves into.
 bin/compose exec php bin/console control:operator:create you@example.com
 ```
 
-The password is generated and printed **once**. There is no way to read it back;
-if it is lost, rotate it.
+It **asks for the password** rather than generating one, and takes `--password`
+for a scripted run. An address that already has an operator is refused — creating
+one is not a way to change somebody's password, and `control:operator:password`
+is.
 
 ## Managing them
 

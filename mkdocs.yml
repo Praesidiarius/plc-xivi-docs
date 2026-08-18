@@ -88,12 +88,21 @@ plugins:
 
 nav:
   - Home: index.md
+  - What exists today: what-exists.md
   - Getting Started:
       - getting-started/index.md
       - Installation: getting-started/installation.md
       - The first operator: getting-started/first-operator.md
       - The control plane: getting-started/control-plane.md
       - The first customer: getting-started/first-tenant.md
+  - Running an installation:
+      - running/index.md
+      - Configuration: running/configuration.md
+      - Hostnames: running/hostnames.md
+      - Deploying: running/deploying.md
+      - Scheduled jobs: running/scheduled-jobs.md
+      - Self-service signup: running/signup.md
+      - Commands: running/commands.md
   - The Basics:
       - the-basics/index.md
       - Records: the-basics/records.md

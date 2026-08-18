@@ -23,6 +23,11 @@ and that **no customer is served on**:
 CONTROL_PLANE_HOST=admin.example.net
 ```
 
+!!! warning "This is a deployment step"
+
+    Skipping it leaves the control plane on `control.localhost`, which is the
+    development default and is not a hostname anybody will reach in production.
+
 That one variable is all there is to it. The value is added to the list of hosts
 served *without* a customer, so the host serving the control plane is by
 construction one that resolves no customer, and there is no second setting to
@@ -46,6 +51,9 @@ forged `Host` exactly as they treat a real one.
 
 Prefer a name that is not guessable from the customer-facing domain — not because
 guessing it grants anything, but because there is no reason to advertise it.
+
+You do **not** have to add it to `XIVI_TRUSTED_DOMAINS`; every host served
+without a customer is added for you. See [Hostnames](../running/hostnames.md).
 
 ## What you can do there
 

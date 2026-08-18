@@ -21,6 +21,10 @@ Once a customer exists and somebody can sign in to it, [The Basics](../the-basic
 explains what they are looking at: records, the modules that shape them, and how
 a customer changes that shape without anybody deploying anything.
 
+If what you have just built is going to serve real customers, everything that
+changes when it leaves your laptop — hostnames, secrets, the deploy step, the two
+cron entries — is [Running an installation](../running/index.md).
+
 If you are deciding how to *run* this rather than how to use it,
 [Architecture](../architecture/index.md) is the shorter road — particularly
 [Two images](../architecture/two-images.md), which is the decision that most

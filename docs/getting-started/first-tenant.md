@@ -57,12 +57,16 @@ Worth knowing:
 
 ## Removing a customer
 
+This is also how a customer is removed on a production installation, where
+`tenant:reset` does not exist:
+
 ```console
 bin/compose exec php bin/console tenant:deprovision bulk
 ```
 
 It names the database, the role, the hostnames and how many records are in there,
-then asks — and pressing return is *no*. An unattended run needs `--force`.
+then asks — and pressing return is *no*. An unattended run needs `--force`; `-n`
+on its own is refused rather than answered with a default.
 
 !!! danger
 

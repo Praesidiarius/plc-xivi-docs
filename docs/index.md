@@ -21,6 +21,15 @@ the [main repository](https://github.com/Praesidiarius/plc-xivi).
 
     [:octicons-arrow-right-24: Start here](getting-started/index.md)
 
+-   :material-server-network: **Running an installation**
+
+    ---
+
+    Configuration, hostnames, deploying, the cron entries — everything that is a
+    decision once it is not on your laptop.
+
+    [:octicons-arrow-right-24: Run it](running/index.md)
+
 -   :material-cube-outline: **The Basics**
 
     ---
@@ -64,6 +73,8 @@ customer adds, renames and removes them without anybody deploying anything.
 **An operator runs the installation.** They see every customer, provision new
 ones and decide what the modules cost. They are not a user of any customer and
 cannot read anybody's records.
+
+The full inventory of what is built is [What exists today](what-exists.md).
 
 ## Licence
 
