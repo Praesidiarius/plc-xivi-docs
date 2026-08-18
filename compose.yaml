@@ -1,34 +1,20 @@
-# The documentation build, in a container, because there is no PHP on the host.
+# The documentation, built and served by the image its own maintainers publish.
 #
-# The main repository works under the same rule — `bin/compose`, never a local
-# interpreter — and there is no reason for the documentation to be the one thing
-# that needs a toolchain installed by hand. `symfony-tools/docs-builder` wants
-# PHP 8.4 or newer; this pins 8.5 to match what Xivi itself runs on.
+# Nothing is installed on the host — the same rule the main repository works
+# under, where every command goes through `bin/compose`. `bin/docs` wraps this.
 services:
     docs:
-        image: php:8.5-cli-alpine
+        image: squidfunk/mkdocs-material:9
         working_dir: /docs
         volumes:
             - .:/docs
-            - docs-composer-cache:/tmp/composer-cache
-        environment:
-            COMPOSER_CACHE_DIR: /tmp/composer-cache
-            # The builder writes into _build/output as whoever the container is.
-            # Matching the host user keeps the tree editable afterwards, which is
-            # the same reason the main repository passes APP_UID/APP_GID.
-            HOME: /tmp
-        user: "${DOCS_UID:-1000}:${DOCS_GID:-1000}"
         ports:
-            # 8081 rather than 8080, because the main repository's stack already
-            # publishes Adminer on 8080 and the two are routinely up together —
-            # somebody reading the documentation is usually somebody running the
-            # thing it documents. Override with DOCS_PORT if 8081 is taken too.
-            - "127.0.0.1:${DOCS_PORT:-8081}:8080"
-        # Composer is not in the base image and installing it into the image
-        # would mean maintaining an image. One `curl` on first use is cheaper,
-        # and the cache volume above means it is genuinely once.
-        entrypoint: ["/bin/sh", "-c"]
-        command: ["sleep infinity"]
-
-volumes:
-    docs-composer-cache:
+            # 8081 rather than the image's default 8000 and rather than 8080,
+            # because the main repository's stack publishes Adminer on 8080 and
+            # the two are routinely up together — somebody reading this is
+            # usually running the thing it documents. DOCS_PORT overrides it.
+            - "127.0.0.1:${DOCS_PORT:-8081}:8000"
+        # The image runs as root and writes `site/` into the mounted tree. Match
+        # the host user so the build output stays editable and deletable, which
+        # is the same reason `bin/compose` passes APP_UID/APP_GID next door.
+        user: "${DOCS_UID:-1000}:${DOCS_GID:-1000}"

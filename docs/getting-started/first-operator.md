@@ -1,5 +1,4 @@
-The First Operator
-==================
+# The First Operator
 
 An **operator** is somebody who administers the installation itself: they see
 every customer, provision new ones and decide what the modules cost. They are not
@@ -11,25 +10,23 @@ control plane refuses everybody until the first one is created from the command
 line, which is a deliberate choice rather than an omission: the surface that can
 see every customer is not one anybody should be able to enrol themselves into.
 
-Creating one
-------------
+## Creating one
 
-.. code-block:: terminal
-
-    $ bin/compose exec php bin/console control:operator:create you@example.com
+```console
+bin/compose exec php bin/console control:operator:create you@example.com
+```
 
 The password is generated and printed **once**. There is no way to read it back;
 if it is lost, rotate it.
 
-Managing them
--------------
+## Managing them
 
-.. code-block:: terminal
-
-    $ bin/compose exec php bin/console control:operator:list
-    $ bin/compose exec php bin/console control:operator:revoke someone@example.com
-    $ bin/compose exec php bin/console control:operator:restore someone@example.com
-    $ bin/compose exec php bin/console control:operator:password you@example.com
+```console
+bin/compose exec php bin/console control:operator:list
+bin/compose exec php bin/console control:operator:revoke someone@example.com
+bin/compose exec php bin/console control:operator:restore someone@example.com
+bin/compose exec php bin/console control:operator:password you@example.com
+```
 
 Four things about that set are worth knowing before you need them:
 
@@ -48,8 +45,7 @@ point of rotating it.
 access to a customer's records; those are separate accounts in a separate
 database.
 
-Next
-----
+## Next
 
 The operator exists but has nowhere to sign in yet. That is
-:doc:`control-plane`.
+[control plane](control-plane.md).

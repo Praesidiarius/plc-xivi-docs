@@ -2,114 +2,49 @@
 #
 # Build and read the Xivi documentation.
 #
-#   bin/docs build     build from nothing into _build/output — checks every page
-#   bin/docs quick     build incrementally; fast, and skips pages it has seen
-#   bin/docs serve     build, then serve it on http://localhost:8081
+#   bin/docs serve     serve on http://localhost:8081, rebuilding as you edit
+#   bin/docs build     build once into site/ — this is the one CI should run
 #   bin/docs shell     a shell in the container, for when something is wrong
 #
-# **Everything runs in a container**, because there is no PHP on the host — the
-# same rule `bin/compose` enforces in the main repository, and the reason this
-# script exists rather than a line in a README telling somebody to install PHP
-# 8.4 and Composer.
+# **Everything runs in a container**, because nothing is installed on the host —
+# the same rule `bin/compose` enforces in the main repository. The image is
+# `squidfunk/mkdocs-material`, published by the theme's own maintainers, so there
+# is no toolchain here to keep up to date beyond a tag.
 #
-# The first run downloads Composer and the builder into `_build/vendor/`, which
-# is gitignored. Later runs find them there and start immediately.
+# `build` is strict: a link to a page that does not exist fails it. That is set
+# in `mkdocs.yml` rather than here, so an editor running mkdocs directly gets the
+# same answer as CI.
 
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-# The container writes into the working tree, so it runs as whoever is reading
-# it. Without this, `_build/output` comes back owned by root and the next build
-# from an editor cannot delete it.
+# The container writes `site/` into the working tree, so it runs as whoever is
+# reading it. Without this the output comes back owned by root and the next
+# build cannot delete it.
 DOCS_UID="$(id -u)"
 DOCS_GID="$(id -g)"
 export DOCS_UID DOCS_GID
 
-compose() {
-	docker compose "$@"
-}
-
-# Run a command inside the docs container, starting it if it is not already up.
-# `sleep infinity` is the container's command, so it stays around between
-# invocations and a second build does not pay for a container start.
-in_container() {
-	if [ -z "$(compose ps -q docs 2>/dev/null)" ]; then
-		compose up -d --wait docs >/dev/null 2>&1 || compose up -d docs >/dev/null
-	fi
-
-	compose exec -T docs sh -c "$1"
-}
-
-# Composer, fetched once into the container's cache rather than baked into an
-# image. An image would have to be built, tagged and rebuilt whenever PHP moved;
-# this is one download that the named volume then keeps.
-ensure_composer() {
-	in_container '
-		set -e
-		if [ ! -x /tmp/composer.phar ]; then
-			php -r "copy(\"https://getcomposer.org/installer\", \"/tmp/composer-setup.php\");"
-			php /tmp/composer-setup.php --install-dir=/tmp --filename=composer.phar --quiet
-			rm -f /tmp/composer-setup.php
-		fi
-	'
-}
-
-ensure_dependencies() {
-	if [ -d _build/vendor ]; then
-		return
-	fi
-
-	printf 'Installing the documentation builder…\n'
-	ensure_composer
-	in_container 'cd /docs/_build && php /tmp/composer.phar install --no-interaction --quiet'
-}
-
-build() {
-	ensure_dependencies
-	in_container 'cd /docs && php _build/build.php'
-}
-
-# **A build from nothing, which is the only one that checks every page.**
-#
-# The builder is incremental and caches parsed pages under `_build/output/.cache`.
-# That is what makes an edit-and-look loop quick, and it is also a trap: a page
-# with an error in it that has been built once before is *skipped*, so the build
-# reports success and the error is still there. It cost half an hour the first
-# time, on a code block naming a language the builder does not have.
-#
-# So: `serve` is incremental, because that is a loop somebody is watching. Any
-# build that matters — before committing, in CI — should be this one.
-rebuild() {
-	ensure_dependencies
-	in_container 'rm -rf /docs/_build/output'
-	build
-}
-
-case "${1:-build}" in
-	build)
-		rebuild
-		;;
-	quick)
-		build
-		;;
+case "${1:-serve}" in
 	serve)
-		build
-		printf '\nReading at http://localhost:%s — Ctrl-C to stop.\n\n' "${DOCS_PORT:-8081}"
-		in_container 'cd /docs/_build/output && php -S 0.0.0.0:8080'
+		printf 'Reading at http://localhost:%s — Ctrl-C to stop.\n\n' "${DOCS_PORT:-8081}"
+		# `--dev-addr` on 0.0.0.0 because the port is published from inside the
+		# container; the image's default binds the loopback it cannot be reached on.
+		docker compose run --rm --service-ports docs serve --dev-addr=0.0.0.0:8000
+		;;
+	build)
+		docker compose run --rm docs build --strict
 		;;
 	shell)
-		in_container 'cd /docs && sh' || compose exec docs sh
-		;;
-	down)
-		compose down
+		docker compose run --rm --entrypoint sh docs
 		;;
 	-h|--help)
-		sed -n '3,9p' "${BASH_SOURCE[0]}" | cut -c 3-
+		sed -n '3,7p' "${BASH_SOURCE[0]}" | cut -c 3-
 		;;
 	*)
 		printf 'Unknown command: %s\n\n' "$1" >&2
-		sed -n '3,9p' "${BASH_SOURCE[0]}" | cut -c 3- >&2
+		sed -n '3,7p' "${BASH_SOURCE[0]}" | cut -c 3- >&2
 		exit 64
 		;;
 esac

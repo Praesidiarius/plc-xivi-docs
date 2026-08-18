@@ -1,0 +1,98 @@
+site_name: Xivi Documentation
+site_description: >-
+  Xivi is a multi-tenant ERP: one installation, many customers, each with their
+  own database and their own hostname.
+site_url: https://praesidiarius.github.io/plc-xivi-docs/
+repo_url: https://github.com/Praesidiarius/plc-xivi
+repo_name: Praesidiarius/plc-xivi
+edit_uri: https://github.com/Praesidiarius/plc-xivi-docs/edit/main/docs/
+copyright: MIT, like Xivi itself.
+
+theme:
+  name: material
+  language: en
+  features:
+    # The left-hand tree, expanded, so the whole shape of the documentation is
+    # visible from any page. There is not enough of it yet to be worth hiding.
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    # "Next" and "previous" at the foot of a page. Getting Started is a sequence
+    # and reads as one; this is what makes that obvious without saying it.
+    - navigation.footer
+    - toc.follow
+    - content.code.copy
+    - content.action.edit
+    - search.suggest
+    - search.highlight
+  palette:
+    # Both, because documentation is read in both, and a site that ignores the
+    # reader's setting is a site that gets a screenshot taken of it at 2am.
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Follow the system
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  # The cards on the index page, and the shorthand that makes them readable in
+  # the source as well as the browser.
+  - attr_list
+  - md_in_html
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/index.md
+      - Installation: getting-started/installation.md
+      - The first operator: getting-started/first-operator.md
+      - The control plane: getting-started/control-plane.md
+      - The first customer: getting-started/first-tenant.md
+  - The Basics:
+      - the-basics/index.md
+      - Records: the-basics/records.md
+      - Modules: the-basics/modules.md
+      - Fields: the-basics/fields.md
+  - Architecture:
+      - architecture/index.md
+      - Tenancy: architecture/tenancy.md
+      - The control plane: architecture/control-plane.md
+      - Two images: architecture/two-images.md
+
+# Fail the build on a link to a page that does not exist, rather than shipping
+# it. A documentation site's most common defect is a dead internal link, and it
+# is the one a build can catch for free.
+strict: true
