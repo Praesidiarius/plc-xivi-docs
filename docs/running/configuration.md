@@ -24,6 +24,7 @@ with real environment variables or with the Symfony secrets vault.
 | `XIVI_SIGNUP_SECRET` | The shared secret the calling site presents in `X-Xivi-Signup-Key` |
 | `XIVI_SIGNUP_PLANS` | Which plans self-service may ask for, comma separated, most ordinary first |
 | `PRICE_CURRENCY` | The ISO 4217 code this deployment's module price list is in. **Empty means prices render as bare numbers** — see below |
+| `XIVI_MONITOR_PINGS` | `command=<ping url>` pairs, comma separated: each watched scheduled job pings its URL when it runs. **Empty means nothing is sent anywhere and nothing else changes** — see [Monitoring](monitoring.md) |
 | `MAILER_DSN` | Where mail this installation sends goes |
 | `MAILER_SENDER` | The address this installation sends as. Empty is allowed — see below |
 

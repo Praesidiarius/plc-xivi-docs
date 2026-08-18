@@ -23,6 +23,7 @@ container, from the image that carries the administration surface — see
 | `tenant:migrate [--slug=]` | Applies tenant migrations to every customer. Exits **0** when they are all at the latest version, **1** when it could not run at all (empty registry, unknown slug) and **3** when one failed while the others succeeded. `bin/deploy` runs it |
 | `tenant:permissions:grant-all <slug>` | Grants every action on every installed module to one customer's non-admin users; the upgrade path for an installation that predates permissions, and the way back into a locked-out one |
 | `tenant:usage:collect [--slug=]` | Counts each customer's users, last sign-in and records into the control plane, one at a time; put it in cron — see [Scheduled jobs](scheduled-jobs.md) |
+| `tenant:purchase:collect [--slug=]` | Collects the modules each customer has asked to buy into the control plane, so an operator sees the request at all; put it in cron — see [Scheduled jobs](scheduled-jobs.md) |
 | `tenant:rotate-secrets` | Re-encrypts stored passwords with the active key — see [Configuration](configuration.md) |
 | `tenant:reset <slug>` | **Development only**, and absent from a production image. Deprovision, provision, install `--modules`, generate `--records`, print the admin password |
 | `tenant:inspect [slug] [module]` | **Development only.** Customers with their schema state and installed modules; with a slug, that customer's real field definitions |
@@ -47,6 +48,7 @@ More about what an operator is, and why there is no sign-up:
 | `deploy:check-secrets` | Refuses in production on a secret still set to the placeholder committed in `.env`. The container entrypoint runs it on every start; it does nothing outside `APP_ENV=prod` |
 | `deploy:check-hosts` | Prints the hostnames this installation answers to, and names every customer the pattern would answer with a 400. `bin/deploy` runs it and stops on exit 3; the entrypoint runs it and only prints |
 | `deploy:check-control-plane [--address=]` | Prints which addresses `CONTROL_PLANE_ALLOWED_IPS` admits, and whether one you name would get in. Exit 3 if an entry is not an address or the address you asked about would be refused. **Run it before you depend on that variable** — see [The control plane](../getting-started/control-plane.md#restricting-it-to-your-own-addresses) |
+| `deploy:crontab [--directory=]` | Prints the cron entries this build needs, what goes stale without each one, and whether anything is watching it. Output is a crontab, so it can be redirected rather than retyped. Exit 3 when some jobs are watched and others are not — see [Monitoring](monitoring.md) |
 | `deploy:registry-grants <role>` | Prints the SQL that gives the customer-facing image a read-only control-plane role — see [Deploying](deploying.md) |
 | `signup:provision [--email=]` | Turns confirmed self-service signups into customers, one at a time, and invites each first user; put it in cron — see [Scheduled jobs](scheduled-jobs.md) |
 | `doctrine:migrations:migrate --em=control` | Control-plane schema only. `bin/deploy` is normally what runs this |

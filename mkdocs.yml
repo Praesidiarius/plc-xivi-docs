@@ -101,6 +101,7 @@ nav:
       - Hostnames: running/hostnames.md
       - Deploying: running/deploying.md
       - Scheduled jobs: running/scheduled-jobs.md
+      - Monitoring: running/monitoring.md
       - Self-service signup: running/signup.md
       - Commands: running/commands.md
   - The Basics:
