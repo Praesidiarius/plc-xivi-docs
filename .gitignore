@@ -1,0 +1,7 @@
+# The builder and its dependencies, installed by `bin/docs` on first use.
+/_build/vendor/
+/_build/composer.lock
+
+# The built site. Generated from the .rst files beside it; never edited, never
+# committed. Publishing is a separate question (see README).
+/_build/output/

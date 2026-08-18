@@ -1,0 +1,25 @@
+Architecture
+============
+
+How an installation is put together, for somebody deciding how to run it.
+
+.. toctree::
+    :maxdepth: 1
+
+    tenancy
+    control-plane
+    two-images
+
+.. note::
+
+    **This is not the design brief.** The reasoning behind each decision — why
+    records are not ORM entities, why mail is synchronous, why a counter is
+    guarded inside one statement — lives with the code, in
+    ``docs/architecture.md`` of the `main repository`_. It is cited by section
+    number throughout the issue tracker and it stays where the code is, because
+    the people and tools changing the code read it there.
+
+    These pages are the other half: what an installation *is*, for somebody
+    deploying or evaluating one rather than changing it.
+
+.. _`main repository`: https://github.com/Praesidiarius/plc-xivi
