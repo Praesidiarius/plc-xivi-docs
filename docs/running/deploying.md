@@ -1,10 +1,176 @@
 # Deploying
 
-There is no deploy tool here yet. Which host, which registry and how a rollback
-works are still open. What *is* here is the step a deploy has to run, whichever
-tool eventually does it.
+An installation is deployed with **Deployer**, driving `docker compose` on the
+target over SSH. One command builds the image, pushes it to a registry, migrates
+the control plane and every customer, and only then replaces the running
+containers.
 
-## The step
+```console
+bin/release <target>
+```
+
+The target host needs **Docker, Compose, and nothing else**: no PHP, no Postgres
+client, no rsync. Everything Xivi runs, it runs in containers.
+
+!!! tip "Set Docker's log rotation before anything else"
+
+    The default is unbounded, and the disk is usually the smallest thing on a
+    box. In `/etc/docker/daemon.json`:
+
+    ```json
+    { "log-driver": "json-file", "log-opts": { "max-size": "10m", "max-file": "3" } }
+    ```
+
+## Once per installation
+
+Two files, both kept out of version control, describe *your* deployment:
+
+```console
+cp .hosts.yaml.dist .hosts.yaml            # which boxes, which image each runs
+cp .env.deploy.dist .env.deploy.<target>   # secrets, hostnames, sizing
+bin/compose exec php vendor/bin/dep secrets:install <target>
+```
+
+`secrets:install` writes the environment file to the target once, at mode 600.
+**A deploy never writes it again.** Rotating a secret means editing it there and
+deploying again, which is deliberate: a deploy that shipped your production
+secrets every time would leave them in the shell history of every machine that
+ever deployed, and would silently overwrite a value somebody had just rotated.
+
+Generate the two secrets the guard checks:
+
+```console
+# APP_SECRET
+openssl rand -hex 32
+# TENANT_SECRET_KEYS is a keyring, not a key
+php -r 'echo json_encode(["1" => base64_encode(random_bytes(32))]);'
+```
+
+An instance that starts on the values committed in `.env` **refuses to boot**
+rather than encrypting customer data with a key that is published in the
+repository.
+
+The provisioning database role needs `CREATEDB`, `CREATEROLE` and
+**`pg_signal_backend`**. Without the last one it cannot drop a customer database
+that somebody is still connected to, and you find out at the worst moment.
+
+## Every release
+
+```console
+export GHCR_USER=<your registry login>
+export GHCR_TOKEN_FILE=~/somewhere/outside/the/checkout
+bin/release <target>
+```
+
+In order, that:
+
+1. builds the image the target is configured for, and pushes it;
+2. pulls it on the target **by digest**, not by tag;
+3. runs `bin/deploy` out of the new image: secrets, control plane, then every
+   customer;
+4. replaces the serving containers;
+5. waits for the instance to report healthy;
+6. writes the cron entries this release needs.
+
+**Three before four is the point.** Tenant migrations are additive only, so the
+old code keeps serving correctly against the new schema while the walk runs and
+the instance stays up. A customer that fails to migrate fails the deploy, before
+anything is replaced.
+
+**By digest and not by tag**, so a container that restarts three weeks later
+comes back as the same code rather than as whatever the tag points at by then.
+
+## Rolling back
+
+Deploy the previous digest. It builds nothing:
+
+```console
+bin/release <target> --tag=sha256:<previous digest>
+```
+
+**It does not roll the databases back**, and does not need to. A release that
+added a column added it everywhere, and stepping the code back leaves it there;
+old code meets a newer schema, finds every column it knew about, and ignores the
+rest. That holds because tenant migrations may not drop, rename, or narrow
+anything. A change that genuinely removes something is **two releases**, and the
+second one is not safe to roll back until the first is everywhere.
+
+A failed deploy needs no rollback at all: nothing is replaced until after the
+migration, so the previous image is still serving.
+
+## Certificates, without listing your customers
+
+Customers are served on their own hostnames, so there is no fixed list of names
+to certify and no wildcard to buy. Caddy gets a certificate the first time a
+hostname is asked for, and **asks the application first** whether it serves that
+name.
+
+That question is not optional. Without it, anybody who points a DNS record at
+your address causes a certificate request, and the rate limit those spend is
+counted per registered domain: it is your customers' budget being burned.
+
+The endpoint answers from the registry plus your platform hostnames, returns a
+status code and no body, and **refuses any request that did not come from inside
+the container**, so it cannot be used from outside to ask whether a given
+customer exists.
+
+Nothing to configure; it is on. What you do have to get right is that the
+hostname really resolves to your box, because no certificate authority can issue
+for a name it cannot reach.
+
+!!! warning "Before public DNS exists"
+
+    A hosts file on your own machine is not enough, and the staging endpoint of
+    a certificate authority is no different: validation is an inbound request
+    from the authority, over public DNS. To rehearse anyway, set
+    `CADDY_TLS_ISSUER=issuer internal`. Caddy then signs locally, nothing trusts
+    the certificate, and the ask endpoint is still consulted, which is the half
+    worth rehearsing. Remove the line once DNS resolves.
+
+## Scheduled jobs
+
+The deploy writes `/etc/cron.d/xivi` from the job list in the release being
+deployed, so the schedule cannot be a version behind the commands it names. To
+see what they are and whether anything is watching them:
+
+```console
+bin/console deploy:crontab
+```
+
+**Nothing watches them by default**, and a scheduled job that stops is invisible:
+the screens built on it go stale quietly and an empty mailbox looks exactly like
+a healthy one. `XIVI_MONITOR_PINGS` maps each job to a URL that an outside
+service alarms on when a ping does not arrive. See
+[Monitoring](monitoring.md).
+
+## Things that will catch you once
+
+**An installation with no customers yet stops the deploy.** That is deliberate:
+a registry that has *lost* its customers looks identical from the inside to one
+that never had any, and the first should stop a release. If yours is empty on
+purpose, such as one waiting for its first self-service signup, say so with
+`XIVI_ALLOW_EMPTY_REGISTRY=1`. It changes nothing else.
+
+**Check which SMTP port your host can actually reach.** Providers block outbound
+mail ports to keep their address ranges off blocklists, and the block is a
+timeout rather than a refusal, so the wrong choice looks like mail hanging rather
+than mail failing. 587 is open more often than 465.
+
+```console
+docker compose ... run --rm --entrypoint php php -r \
+  'var_dump((bool) @fsockopen("mail.example.com", 587, $e, $m, 8));'
+```
+
+**Percent-encode the credentials in `MAILER_DSN`.** A username that is an email
+address puts an `@` inside the userinfo, and a password may hold `[`, `]`, `/`,
+`:` or `#`. All of them break URL parsing, and `[` in particular makes the parser
+read what follows as an IPv6 address and reject the whole string. `@` is `%40`,
+`[` is `%5B`, `]` is `%5D`.
+
+## The step a deploy runs
+
+`bin/release` runs this for you. It is documented separately because it is the
+part that must happen whichever tool eventually runs it:
 
 ```console
 # in a one-shot container, from the image being released,
