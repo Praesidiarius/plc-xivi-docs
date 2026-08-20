@@ -1,14 +1,14 @@
 # Xivi Documentation
 
-Xivi is a multi-tenant ERP: one installation, many customers, each with their own
-database and their own hostname. What a customer's records look like is theirs to
-decide — the modules ship a starting shape and the customer changes it — so most
-of what follows is about that idea and its consequences.
+Xivi is a multi-tenant ERP: one installation, many customers, each with their
+own database and their own hostname. What a customer's records look like is
+theirs to decide. The modules ship a starting shape and the customer changes
+it, so most of what follows is about that idea and its consequences.
 
 These pages are for the two people who meet Xivi from outside the code: whoever
 **deploys and runs an installation**, and whoever **uses one**. The reasoning
-behind how it is built lives with the code instead, in `docs/architecture.md` of
-the [main repository](https://github.com/Praesidiarius/plc-xivi).
+behind how it is built lives with the code instead, in `docs/architecture.md`
+of the [main repository](https://github.com/Praesidiarius/plc-xivi).
 
 <div class="grid cards" markdown>
 
@@ -16,8 +16,8 @@ the [main repository](https://github.com/Praesidiarius/plc-xivi).
 
     ---
 
-    From nothing to an installation with a customer in it, in the order the steps
-    actually have to happen.
+    From nothing to an installation with a customer in it, in the order the
+    steps actually have to happen.
 
     [:octicons-arrow-right-24: Start here](getting-started/index.md)
 
@@ -25,7 +25,7 @@ the [main repository](https://github.com/Praesidiarius/plc-xivi).
 
     ---
 
-    Configuration, hostnames, deploying, the cron entries — everything that is a
+    Configuration, hostnames, deploying, the cron entries. Everything that is a
     decision once it is not on your laptop.
 
     [:octicons-arrow-right-24: Run it](running/index.md)
@@ -43,8 +43,8 @@ the [main repository](https://github.com/Praesidiarius/plc-xivi).
 
     ---
 
-    How an installation is put together — tenancy, the control plane, the two
-    images — for somebody deciding how to run it.
+    How an installation is put together (tenancy, the control plane, the two
+    images), for somebody deciding how to run it.
 
     [:octicons-arrow-right-24: How it fits together](architecture/index.md)
 
@@ -52,8 +52,8 @@ the [main repository](https://github.com/Praesidiarius/plc-xivi).
 
     ---
 
-    Xivi itself, its design brief, and the issue tracker where the reasoning for
-    each decision is recorded.
+    Xivi itself, its design brief, and the issue tracker where the reasoning
+    for each decision is recorded.
 
     [:octicons-arrow-right-24: On GitHub](https://github.com/Praesidiarius/plc-xivi)
 
@@ -62,13 +62,13 @@ the [main repository](https://github.com/Praesidiarius/plc-xivi).
 ## What Xivi is
 
 **One installation serves many customers.** Each has their own PostgreSQL
-database and their own hostname; none can see another's records, and that
-separation is the database's rather than a filter somebody has to remember to
-apply.
+database and their own hostname. None can see another's records, and the
+database enforces that separation rather than a filter somebody has to remember
+to apply.
 
-**A customer's records are theirs to shape.** Modules — contacts, articles,
-orders, invoices — arrive with a starting set of fields, and from then on the
-customer adds, renames and removes them without anybody deploying anything.
+**A customer's records are theirs to shape.** Modules arrive with a starting
+set of fields, and from then on the customer adds, renames and removes them
+without anybody deploying anything.
 
 **An operator runs the installation.** They see every customer, provision new
 ones and decide what the modules cost. They are not a user of any customer and
@@ -78,7 +78,7 @@ The full inventory of what is built is [What exists today](what-exists.md).
 
 ## Licence
 
-This documentation is MIT, like Xivi itself — see
+This documentation is MIT, like Xivi itself. See
 [LICENSE](https://github.com/Praesidiarius/plc-xivi-docs/blob/main/LICENSE).
 
 Its shape takes after [symfony/symfony-docs](https://github.com/symfony/symfony-docs),
