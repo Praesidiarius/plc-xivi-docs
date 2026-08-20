@@ -100,6 +100,7 @@ nav:
       - Configuration: running/configuration.md
       - Hostnames: running/hostnames.md
       - Deploying: running/deploying.md
+      - Backups: running/backups.md
       - Scheduled jobs: running/scheduled-jobs.md
       - Monitoring: running/monitoring.md
       - Self-service signup: running/signup.md

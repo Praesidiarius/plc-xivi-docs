@@ -26,6 +26,7 @@ with real environment variables or with the Symfony secrets vault.
 | `XIVI_SIGNUP_PLANS` | Which plans self-service may ask for, comma separated, most ordinary first |
 | `XIVI_PUBLIC_ROLE` | The database role the customer-facing image runs as, so a deploy can verify its grants. Empty means a single-image deployment, and the check stands down. See [Deploying](deploying.md) |
 | `PRICE_CURRENCY` | The ISO 4217 code this deployment's module price list is in. **Empty means prices render as bare numbers**. See below |
+| `XIVI_ATTACHMENTS_DIR` | The directory a record's files are kept in, one subdirectory per customer. **It has to be a volume**, and it is the second thing to back up. See [Backups](backups.md) |
 | `XIVI_MAX_ATTACHMENT_BYTES` | The largest document a mail may carry, chosen against what receiving servers accept. The default is 7 MiB |
 | `XIVI_MONITOR_PINGS` | `command=<ping url>` pairs, comma separated: each watched scheduled job pings its URL when it runs. **Empty means nothing is sent anywhere and nothing else changes**. See [Monitoring](monitoring.md) |
 | `MAILER_DSN` | Where mail this installation sends goes |

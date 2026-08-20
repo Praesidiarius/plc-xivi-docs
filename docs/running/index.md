@@ -17,14 +17,16 @@ In the order you would meet them:
    what happens when that is wrong, and what a load balancer in front changes.
 3. **[Deploying](deploying.md)**: the step a deploy has to run, the two images
    and which one goes where.
-4. **[Scheduled jobs](scheduled-jobs.md)**: the cron entries an installation
+4. **[Backups](backups.md)**: the two things to take a copy of, why it is two
+   rather than one, and the check that says whether they still agree.
+5. **[Scheduled jobs](scheduled-jobs.md)**: the cron entries an installation
    needs, and what is stale without each one.
-5. **[Monitoring](monitoring.md)**: what to watch and how, starting with the
+6. **[Monitoring](monitoring.md)**: what to watch and how, starting with the
    one thing an installation cannot tell you about itself: whether those jobs
    are still running.
-6. **[Self-service signup](signup.md)**: off unless you switch it on, and what
+7. **[Self-service signup](signup.md)**: off unless you switch it on, and what
    switching it on involves.
-7. **[Commands](commands.md)**: the console commands an installation is
+8. **[Commands](commands.md)**: the console commands an installation is
    administered with.
 
 !!! note "Working on Xivi rather than running it?"

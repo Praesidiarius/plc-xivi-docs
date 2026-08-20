@@ -21,6 +21,7 @@ container, from the image that carries the administration surface. See
 | `tenant:module:install <slug> <module>` | Installs a module for one customer: its table and field definitions. `--preset` picks which fields, `--locale` which language its labels are seeded in |
 | `tenant:list` | Shows the registry |
 | `tenant:migrate [--slug=]` | Applies tenant migrations to every customer. Exits **0** when all are at the latest version, **1** when it could not run at all, and **3** when one failed while the others succeeded. `bin/deploy` runs it |
+| `tenant:files:check [--slug=]` | Reports records naming a file that is not there, and files no record names. Exits **0**, **1** or **3** like `tenant:migrate`. It reports and never deletes. See [Backups](backups.md) |
 | `tenant:schema:validate [--slug=]` | Checks each customer's schema against the mapping, entering each database the way the application does |
 | `tenant:permissions:grant-all <slug>` | Grants every action on every installed module to one customer's non-admin users: the upgrade path for an installation that predates permissions, and the way back into a locked-out one |
 | `tenant:usage:collect [--slug=]` | Counts each customer's users, last sign-in and records into the control plane. Put it in cron; see [Scheduled jobs](scheduled-jobs.md) |

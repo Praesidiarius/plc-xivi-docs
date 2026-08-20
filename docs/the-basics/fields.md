@@ -20,9 +20,18 @@ made on a screen, at any time.
 | Date range | A period, from one date until another, or open-ended. |
 | Choice | One of a list: the field's own, or a shared list the customer keeps. |
 | Reference | Another record, in this module or another. |
+| File | A file on the record: a signed contract, a delivery note, a datasheet. |
 
 A module can add types of its own. The voucher module ships one for voucher
 codes, which knows that `give-10` and `GIVE-10` are the same code.
+
+A file field holds **one** file, of up to 10 MB, of any kind. It is uploaded on
+the record form and downloaded from the record page, and the download goes
+through Xivi rather than being a link anybody holding it can open: whoever may
+not open the record cannot open the file either. Replacing a file removes the
+one it replaced, so there is no history of earlier versions. Where the bytes
+live and what that means for a backup is
+[Backups](../running/backups.md).
 
 A period field can name the field it is exclusive within, and the database then
 refuses two overlapping periods for one room, one machine or one person. Two
