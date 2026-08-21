@@ -54,6 +54,45 @@ The provisioning database role needs `CREATEDB`, `CREATEROLE` and
 **`pg_signal_backend`**. Without the last one it cannot drop a customer database
 that somebody is still connected to, and you find out at the worst moment.
 
+### Nothing is in the store until you put it there
+
+A fresh installation has **every module in `development`**, which means none of
+them is offered in the store. That is the default rather than an oversight: a
+module with no row is in development, and whether a module is finished is a
+decision this installation makes rather than something the build ships with.
+
+```console
+bin/console module:list                       # what exists, and where each one stands
+bin/console module:state <key> published      # offer it to every tenant
+```
+
+An empty store on a new installation looks broken and is not, so this is easy to
+lose an afternoon to. The state lives in the control-plane database, so **moving
+to a new box starts everything at `development` again** and needs the same
+commands.
+
+!!! warning "Publishing is for every tenant, or none"
+
+    There is no per-tenant override, deliberately: whether a module is finished
+    is a fact about the module, and showing one customer a half-built one is the
+    drift the design rejects.
+
+    What the state gates is **the store listing and nothing else.** Installing is
+    not gated by it, because a module is developed by installing it somewhere. So
+    `tenant:module:install <tenant> <key>` gives one customer a module without
+    offering it to anybody else, which is the mechanism when that is what you
+    want.
+
+Pricing is a separate decision from publishing, and a separate command:
+
+```console
+bin/console module:price <key> <unpriced|free|priced|not_for_sale> [amount]
+```
+
+Leave modules **free** until you have somewhere for the money to go. A `priced`
+module is visible to every customer and its install stops at a placeholder, so
+pricing early produces something people can see and cannot finish.
+
 ## Every release
 
 ```console
